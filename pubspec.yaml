@@ -1,6 +1,6 @@
 name: webviewapp
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -11,7 +11,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^9.0.0
-
   cupertino_icons: ^1.0.8
   flutter_inappwebview: ^6.1.5
   url_launcher: ^6.3.0
@@ -19,9 +18,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^5.0.0
 
-flutter:
+flutter_launcher_icons:
+  image_path: "icons/app_logo.png"
+  android: true
+  ios: true
 
+flutter:
   uses-material-design: true

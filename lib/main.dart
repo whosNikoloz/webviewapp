@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webviewapp/credentials_persistence.dart';
 
 import 'cookie_persistence.dart';
 import 'storage_persistence.dart';
@@ -54,6 +55,7 @@ class _WebAppPageState extends State<WebAppPage> {
   @override
   void initState() {
     super.initState();
+    CredentialsPersistence.resetHandlerTracking();
     ptr = PullToRefreshController(
       settings: PullToRefreshSettings(color: Colors.blue),
       onRefresh: () async {
@@ -97,9 +99,26 @@ class _WebAppPageState extends State<WebAppPage> {
 
   bool _isLoginUrl(Uri u) {
     final path = u.path.toLowerCase();
-    return path.contains('login') ||
+    // Check for common login page paths
+    if (path.contains('login') ||
         path.contains('account/login') ||
-        path.contains('auth');
+        path.contains('auth')) {
+      return true;
+    }
+
+    // For beauty.fina24.ge, /Default is the login page when not logged in
+    if (u.host == kRootHost && path == '/default') {
+      return true;
+    }
+
+    return false;
+  }
+
+  bool _isLogoutUrl(Uri u) {
+    final path = u.path.toLowerCase();
+    return path.contains('logout') ||
+        path.contains('signout') ||
+        path.contains('account/logout');
   }
 
   bool _isMedicalUrl(Uri u) {
@@ -231,8 +250,24 @@ class _WebAppPageState extends State<WebAppPage> {
                 await CookiePersistence.saveForUrl(u);
                 await StoragePersistence.save(WebUri(u.toString()), c);
 
+                // Handle logout - DON'T clear credentials, they should persist
+                // Only the session cookies/storage are cleared by the server
+                if (_isLogoutUrl(u)) {
+                  // Reset the medical tried flag so user can navigate after re-login
+                  _medicalTried = false;
+                  _justLoggedInProbe = false;
+                  // Note: We keep credentials saved for easier re-login
+                  return;
+                }
+
                 // Login detection logic
                 if (_isLoginUrl(u)) {
+                  // Wait a bit for the page to fully render
+                  await Future.delayed(Duration(milliseconds: 500));
+
+                  // Inject autofill + capture on login pages
+                  await CredentialsPersistence.injectAutofillAndCaptureJS(c, u);
+
                   // we are on login page; allow user to login and then one-shot try /Medical
                   _medicalTried = false;
                   _justLoggedInProbe = true;
@@ -240,17 +275,19 @@ class _WebAppPageState extends State<WebAppPage> {
                 }
 
                 // Already at /Medical -> done
-                if (_isMedicalUrl(u)) return;
+                if (_isMedicalUrl(u)) {
+                  return;
+                }
 
                 // Not on login and not /Medical:
                 // If looks logged-in or we just finished login, go to /Medical once
                 final logged = await _looksLoggedIn();
+
                 if ((logged || _justLoggedInProbe) && !_medicalTried) {
                   _justLoggedInProbe = false;
                   await _goMedicalOnce();
                 }
               },
-
               onReceivedError: (c, req, err) => ptr?.endRefreshing(),
 
               onProgressChanged: (c, p) {

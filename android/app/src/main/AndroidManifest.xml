@@ -4,9 +4,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     
     <application
-        android:label="webviewapp"
+        android:label="Fina Beauty"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:enableOnBackInvokedCallback="true">
+        <property
+            android:name="android.graphics.render.supports_16kb_page_size"
+            android:value="${supportsPageSize16KB}" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
