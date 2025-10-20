@@ -4,7 +4,6 @@ plugins {
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
-
 import java.util.Properties
 import java.io.FileInputStream
 
@@ -13,9 +12,8 @@ val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
-
 android {
-    namespace = "ge.fina.fina_beauty"
+    namespace = "com.example.webviewapp"
     compileSdk = 36
     ndkVersion = "26.3.11579264"
 
@@ -30,18 +28,15 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "ge.fina.fina_beauty"
+        applicationId = "com.example.webviewapp"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-
-        // Support for 16KB page size devices
         manifestPlaceholders["supportsPageSize16KB"] = "true"
     }
-
     signingConfigs {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String

@@ -4,7 +4,9 @@
       "Bash(flutter build:*)",
       "Bash(./gradlew:*)",
       "Read(//c/Users/Nikoloz/AppData/Local/Android/sdk/ndk/**)",
-      "Bash(sdkmanager:*)"
+      "Bash(sdkmanager:*)",
+      "Bash(test:*)",
+      "Bash(\"C:\\Users\\Nikoloz\\AppData\\Local\\Android\\sdk\\cmdline-tools\\latest\\bin\\sdkmanager.bat\" --uninstall \"ndk;27.0.12077973\")"
     ],
     "deny": [],
     "ask": []
